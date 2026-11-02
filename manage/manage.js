@@ -15,7 +15,7 @@ function setStatus(message, isError = false) {
 
 async function save(next) {
   try {
-    await WordStore.save(next);
+    await WordStore.save({ ...state, ...next });
     state = await WordStore.load();
     render();
     return true;
@@ -38,28 +38,36 @@ function parseWords(text, separator) {
 
 const quoted = (w) => `“${w}”`;
 
+function row(text, removeLabel, onRemove) {
+  const li = document.createElement('li');
+  const label = document.createElement('span');
+  label.textContent = text;
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.className = 'remove';
+  remove.textContent = '×';
+  remove.setAttribute('aria-label', removeLabel);
+  remove.addEventListener('click', onRemove);
+  li.append(label, remove);
+  return li;
+}
+
 function render() {
   $('list-view').hidden = editing;
   $('text-view').hidden = !editing;
   const filter = $('filter').value.trim().toLowerCase();
   const words = state.words.filter((w) => w.includes(filter));
-  $('list').replaceChildren(...words.map((word) => {
-    const li = document.createElement('li');
-    const label = document.createElement('span');
-    label.textContent = quoted(word);
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.className = 'remove';
-    remove.textContent = '×';
-    remove.setAttribute('aria-label', `Unmute ${quoted(word)}`);
-    remove.addEventListener('click', async () => {
-      if (await save({ words: state.words.filter((w) => w !== word) })) setStatus(`Unmuted ${quoted(word)}`);
-    });
-    li.append(label, remove);
-    return li;
-  }));
+  $('list').replaceChildren(...words.map((word) => row(quoted(word), `Unmute ${quoted(word)}`, async () => {
+    if (await save({ words: state.words.filter((w) => w !== word) })) setStatus(`Unmuted ${quoted(word)}`);
+  })));
   $('empty').hidden = words.length > 0;
   $('empty').textContent = state.words.length ? 'No matches.' : 'No words muted yet.';
+  $('channels-on').checked = state.channelsOn;
+  $('channels-panel').hidden = !state.channelsOn;
+  $('channel-list').replaceChildren(...state.channels.map((channel) => row(channel, `Stop exempting ${channel}`, async () => {
+    if (await save({ channels: state.channels.filter((c) => c !== channel) })) setStatus(`No longer exempting ${channel}`);
+  })));
+  $('channel-empty').hidden = state.channels.length > 0;
 }
 
 async function usage() {
@@ -80,6 +88,18 @@ $('add-form').addEventListener('submit', async (e) => {
 });
 
 $('filter').addEventListener('input', render);
+
+$('channels-on').addEventListener('change', (e) => save({ channelsOn: e.target.checked }));
+
+$('channel-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const channel = WordStore.normalizeChannel($('channel-input').value);
+  if (!channel) return;
+  if (await save({ channels: [...state.channels, channel] })) {
+    $('channel-input').value = '';
+    setStatus(`Exempted ${channel}`);
+  }
+});
 
 $('edit-text').addEventListener('click', () => {
   editing = true;
@@ -104,7 +124,7 @@ $('text-save').addEventListener('click', async () => {
 });
 
 $('backup').addEventListener('click', () => {
-  const data = { app: 'youtube-title-mute', version: 1, exportedAt: new Date().toISOString(), words: state.words };
+  const data = { app: 'youtube-title-mute', version: 1, exportedAt: new Date().toISOString(), words: state.words, channels: state.channels, channelsOn: state.channelsOn };
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   a.download = `youtube-title-mute-${new Date().toLocaleDateString('sv')}.json`; // YYYY-MM-DD in local time
@@ -134,7 +154,14 @@ $('restore-file').addEventListener('change', async (e) => {
     return;
   }
   const replace = document.querySelector('input[name="restore-mode"]:checked').value === 'replace';
-  if (await save({ words: replace ? data.words : [...state.words, ...data.words] })) {
+  // Backups from before exempt channels have neither field; those keep the current ones.
+  const hasChannels = Array.isArray(data.channels);
+  const next = {
+    words: replace ? data.words : [...state.words, ...data.words],
+    channels: replace && hasChannels ? data.channels : [...state.channels, ...(hasChannels ? data.channels : [])]
+  };
+  if (replace && typeof data.channelsOn === 'boolean') next.channelsOn = data.channelsOn;
+  if (await save(next)) {
     setStatus(`Restored. Now muting ${state.words.length} words.`);
   }
   e.target.value = '';

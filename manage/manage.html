@@ -37,6 +37,20 @@
     </section>
 
     <section class="card">
+      <h2>Exempt channels</h2>
+      <label class="check"><input type="checkbox" id="channels-on"> Never hide videos from chosen channels</label>
+      <div id="channels-panel" hidden>
+        <form class="add channel-add" id="channel-form">
+          <input id="channel-input" type="text" autocomplete="off" spellcheck="false" placeholder="Name, @handle or link" aria-label="Channel to exempt">
+          <button type="submit">Exempt</button>
+        </form>
+        <ul class="list" id="channel-list"></ul>
+        <p class="empty" id="channel-empty" hidden>No channels yet.</p>
+        <p class="hint">Use the name as YouTube shows it, or the @handle. Shorts in shelves don't name their channel, so they can only be exempted on the channel's own page.</p>
+      </div>
+    </section>
+
+    <section class="card">
       <h2>Backup</h2>
       <div class="row">
         <button type="button" id="backup">Download backup</button>

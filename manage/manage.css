@@ -140,6 +140,7 @@ textarea { height: 14rem; resize: vertical; font-family: ui-monospace, Menlo, mo
 }
 
 .check { display: flex; gap: 0.5rem; align-items: center; cursor: pointer; }
+.channel-add { margin-top: 0.75rem; }
 .restore { display: grid; gap: 0.4rem; margin-top: 0.75rem; }
 
 .status { min-height: 1.2em; margin: 0.75rem 0 0; font-size: 0.85rem; color: var(--muted); }
