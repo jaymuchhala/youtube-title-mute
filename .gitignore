@@ -7,3 +7,5 @@ dist/
 # Local tooling
 .claude/
 .DS_Store
+# Local project notes
+CLAUDE.md
