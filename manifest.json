@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Title Mute for YouTube",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Hides YouTube videos whose titles contain words or phrases you mute. The list syncs with your browser profile.",
   "permissions": ["storage"],
   "icons": {
