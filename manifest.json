@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Title Mute for YouTube",
+  "version": "1.0.0",
+  "description": "Hides YouTube videos whose titles contain words or phrases you mute. The list syncs with your browser profile.",
+  "permissions": ["storage"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Muted title words",
+    "default_popup": "manage/manage.html"
+  },
+  "options_ui": {
+    "page": "manage/manage.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*", "https://m.youtube.com/*"],
+      "js": ["storage.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_start"
+    }
+  ]
+}

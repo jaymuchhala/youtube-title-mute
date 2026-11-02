@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muted title words</title>
+  <link rel="stylesheet" href="manage.css">
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <h1>Muted title words</h1>
+      <span class="usage" id="usage"></span>
+    </header>
+
+    <section id="list-view">
+      <form class="add" id="add-form">
+        <input id="add-input" type="text" autocomplete="off" spellcheck="false" placeholder="Word or phrase; commas for several" aria-label="Words to mute">
+        <button type="submit">Mute</button>
+      </form>
+      <div class="toolbar">
+        <input id="filter" type="search" placeholder="Filter" aria-label="Filter words">
+        <button type="button" class="link" id="edit-text">Edit as text</button>
+      </div>
+      <ul class="list" id="list"></ul>
+      <p class="empty" id="empty" hidden></p>
+      <p class="hint">YouTube videos whose title has one of these words are hidden everywhere: home, search, the sidebar, Shorts shelves and channel pages. * matches any letters, as in spoil*.</p>
+    </section>
+
+    <section id="text-view" hidden>
+      <p class="hint">One word or phrase per line. * matches any letters, as in spoil*.</p>
+      <textarea id="text" spellcheck="false" aria-label="Muted words as text"></textarea>
+      <div class="row">
+        <button type="button" id="text-save">Save</button>
+        <button type="button" class="secondary" id="text-cancel">Cancel</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Backup</h2>
+      <div class="row">
+        <button type="button" id="backup">Download backup</button>
+        <button type="button" class="secondary" id="restore">Restore…</button>
+      </div>
+      <div class="restore" id="restore-panel" hidden>
+        <label class="check"><input type="radio" name="restore-mode" value="merge" checked> Merge with current list</label>
+        <label class="check"><input type="radio" name="restore-mode" value="replace"> Replace current list</label>
+        <input type="file" id="restore-file" accept="application/json,.json">
+      </div>
+    </section>
+
+    <p class="status" id="status" role="status"></p>
+  </main>
+
+  <script src="../storage.js"></script>
+  <script src="manage.js"></script>
+</body>
+</html>
